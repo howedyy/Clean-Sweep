@@ -5,7 +5,18 @@ import type { BookingFormValues } from "@/lib/validation";
 import { BookingModal } from "./booking-modal";
 
 export type BookingPrefill = Partial<
-  Pick<BookingFormValues, "serviceType" | "bedrooms" | "bathrooms" | "frequency" | "addons">
+  Pick<
+    BookingFormValues,
+    | "serviceType"
+    | "bedrooms"
+    | "bathrooms"
+    | "commercialType"
+    | "commercialHours"
+    | "specialistType"
+    | "specialistHours"
+    | "frequency"
+    | "addons"
+  >
 >;
 
 interface BookingContextValue {

@@ -12,19 +12,22 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Clean Swap | Professional Cleaners Across the UK — Book in 60 Seconds",
+  title: "Clean Sweep Oasis LTD | Professional Cleaning & Property Services",
   description:
-    "DBS-checked, eco-friendly cleaners across London and the UK. Regular, deep and end of tenancy cleans from £18/hr, VAT included. Instant quote and booking in 60 seconds.",
+    "Trusted family-run cleaning & property support services across London and the UK. Commercial cleaning from £25/hr, End of Tenancy from £150, gardening & specialist cleans. Fully insured with free no-obligation quotes.",
   keywords: [
-    "cleaners London",
+    "Clean Sweep Oasis",
+    "commercial cleaning London",
+    "office cleaning",
     "end of tenancy cleaning",
-    "deep clean",
+    "deep clean London",
+    "family run cleaners",
+    "gardening odd jobs",
     "domestic cleaner UK",
-    "office cleaning London",
   ],
   openGraph: {
-    title: "Clean Swap — Spotless Spaces, Zero Hassle",
-    description: "Book vetted, eco-friendly cleaners across the UK in 60 seconds.",
+    title: "Clean Sweep Oasis LTD — Reliable • Professional • Family Run",
+    description: "High standard domestic, commercial and specialist cleaning services across London & the UK.",
     locale: "en_GB",
     type: "website",
   },

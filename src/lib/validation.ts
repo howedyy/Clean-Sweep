@@ -3,8 +3,12 @@ import {
   ADDON_IDS,
   BATHROOM_OPTIONS,
   BEDROOM_OPTIONS,
+  COMMERCIAL_HOURS,
+  COMMERCIAL_TYPES,
   FREQUENCIES,
   SERVICE_IDS,
+  SPECIALIST_HOURS,
+  SPECIALIST_TYPES,
   TIME_SLOTS,
 } from "./pricing";
 
@@ -61,10 +65,14 @@ export const bookingSchema = z.object({
   serviceType: z.enum(SERVICE_IDS, { error: "Choose a service" }),
   bedrooms: z.enum(BEDROOM_OPTIONS),
   bathrooms: z.enum(BATHROOM_OPTIONS),
+  commercialType: z.enum(COMMERCIAL_TYPES),
+  commercialHours: z.enum(COMMERCIAL_HOURS),
+  specialistType: z.enum(SPECIALIST_TYPES),
+  specialistHours: z.enum(SPECIALIST_HOURS),
   frequency: z.enum(FREQUENCIES),
   addons: z.array(z.enum(ADDON_IDS)).max(ADDON_IDS.length),
-  // Step 2 — Schedule & Postcode
-  postcode: z.string().trim().refine(isValidUkPostcode, "Enter a valid UK postcode, e.g. SW1A 1AA"),
+  // Step 2 — Schedule
+  postcode: z.string().trim().optional(),
   preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a date for your clean"),
   timeSlot: z.enum(TIME_SLOTS, { error: "Pick a time slot" }),
   // Step 3 — Customer info
@@ -79,8 +87,18 @@ export const bookingSchema = z.object({
 export type BookingFormValues = z.infer<typeof bookingSchema>;
 
 export const BOOKING_STEP_FIELDS = [
-  ["serviceType", "bedrooms", "bathrooms", "frequency", "addons"],
-  ["postcode", "preferredDate", "timeSlot"],
+  [
+    "serviceType",
+    "bedrooms",
+    "bathrooms",
+    "commercialType",
+    "commercialHours",
+    "specialistType",
+    "specialistHours",
+    "frequency",
+    "addons",
+  ],
+  ["preferredDate", "timeSlot"],
   ["fullName", "phone", "email", "notes"],
 ] as const satisfies readonly (readonly (keyof BookingFormValues)[])[];
 

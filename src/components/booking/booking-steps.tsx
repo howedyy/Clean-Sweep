@@ -11,9 +11,15 @@ import {
   ADDONS,
   BATHROOM_OPTIONS,
   BEDROOM_OPTIONS,
+  COMMERCIAL_HOURS,
+  COMMERCIAL_TYPES,
+  COMMERCIAL_TYPE_LABELS,
   FROM_PRICES,
   SERVICE_IDS,
   SERVICES,
+  SPECIALIST_HOURS,
+  SPECIALIST_TYPES,
+  SPECIALIST_TYPE_LABELS,
   TIME_SLOT_LABELS,
   TIME_SLOTS,
   type AddonId,
@@ -26,7 +32,7 @@ import {
   isValidUkPostcode,
   type BookingFormValues,
 } from "@/lib/validation";
-import { ADDON_ICONS, SERVICE_ICONS, SLOT_ICONS, bathLabel, bedLabel } from "./meta";
+import { ADDON_ICONS, SERVICE_ICONS, SLOT_ICONS, bathLabel, bedLabel, hourLabel } from "./meta";
 
 const opt = { shouldValidate: true, shouldDirty: true } as const;
 
@@ -44,19 +50,42 @@ function StepLabel({ children, aside }: { children: React.ReactNode; aside?: Rea
 /* -------------------------------------------------------------------------- */
 export function StepScope() {
   const { control, setValue } = useFormContext<BookingFormValues>();
-  const [service, frequency, bedrooms, bathrooms, addons] = useWatch({
+  const [
+    service = "commercial",
+    frequency = "one-off",
+    bedrooms = "2",
+    bathrooms = "1",
+    commercialType = "offices",
+    commercialHours = "3",
+    specialistType = "gardening",
+    specialistHours = "2",
+    addons = [],
+  ] = useWatch({
     control,
-    name: ["serviceType", "frequency", "bedrooms", "bathrooms", "addons"],
+    name: [
+      "serviceType",
+      "frequency",
+      "bedrooms",
+      "bathrooms",
+      "commercialType",
+      "commercialHours",
+      "specialistType",
+      "specialistHours",
+      "addons",
+    ],
   });
 
   const toggleAddon = (id: AddonId) =>
     setValue("addons", addons.includes(id) ? addons.filter((a) => a !== id) : [...addons, id], opt);
 
+  const isSubscribable = SERVICES[service]?.subscribable;
+
   return (
     <div className="space-y-6">
+      {/* Service Selection */}
       <section>
-        <StepLabel>Service</StepLabel>
-        <div role="radiogroup" aria-label="Service" className="grid grid-cols-3 gap-2 sm:gap-3">
+        <StepLabel aside="Choose from our core services">Service</StepLabel>
+        <div role="radiogroup" aria-label="Service" className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
           {SERVICE_IDS.map((id) => {
             const Icon = SERVICE_ICONS[id];
             const active = service === id;
@@ -68,78 +97,138 @@ export function StepScope() {
                 aria-checked={active}
                 onClick={() => setValue("serviceType", id, opt)}
                 className={cn(
-                  "relative flex flex-col items-start gap-2 rounded-2xl p-3 text-left ring-1 transition-all duration-200 active:scale-[0.98] sm:p-4",
+                  "relative flex flex-col items-start gap-1.5 rounded-2xl p-3 text-left ring-1 transition-all duration-200 active:scale-[0.98] sm:p-3.5",
                   active ? "bg-brand-soft ring-2 ring-brand" : "bg-white ring-line hover:ring-brand/40",
+                  id === "specialist" && "col-span-2 sm:col-span-1",
                 )}
               >
-                <span
-                  className={cn(
-                    "grid size-9 place-items-center rounded-xl transition-colors",
-                    active ? "bg-brand text-white" : "bg-surface text-brand",
-                  )}
-                >
-                  <Icon className="size-[18px]" />
-                </span>
-                <span className="text-[13px] font-semibold leading-tight text-ink sm:text-sm">
-                  {SERVICES[id].short}
-                </span>
-                <span className="text-xs text-muted">
-                  from {formatGBPWhole(FROM_PRICES[id])}
-                  {id === "regular" && "/hr"}
-                </span>
-                {active && (
-                  <motion.span
-                    layoutId="svc-check"
-                    className="absolute right-2.5 top-2.5 grid size-5 place-items-center rounded-full bg-brand text-white"
+                <div className="flex w-full items-center justify-between">
+                  <span
+                    className={cn(
+                      "grid size-8 place-items-center rounded-xl transition-colors",
+                      active ? "bg-brand text-white" : "bg-surface text-brand",
+                    )}
                   >
-                    <Check className="size-3" strokeWidth={3} />
-                  </motion.span>
-                )}
+                    <Icon className="size-4" />
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="svc-check"
+                      className="grid size-4 place-items-center rounded-full bg-brand text-white"
+                    >
+                      <Check className="size-2.5" strokeWidth={3} />
+                    </motion.span>
+                  )}
+                </div>
+                <div>
+                  <span className="block text-[13px] font-semibold leading-tight text-ink sm:text-sm">
+                    {SERVICES[id].short}
+                  </span>
+                  <span className="block text-[11px] text-muted mt-0.5">
+                    from {formatGBPWhole(FROM_PRICES[id])}
+                    {(id === "commercial" || id === "regular") && "/hr"}
+                  </span>
+                </div>
               </button>
             );
           })}
         </div>
       </section>
 
+      {/* Frequency */}
       <section>
-        <StepLabel aside={!SERVICES[service].subscribable ? "One-off service" : undefined}>
+        <StepLabel aside={!isSubscribable ? "One-off service" : undefined}>
           How often?
         </StepLabel>
         <Segmented
           label="Frequency"
-          value={SERVICES[service].subscribable ? frequency : "one-off"}
-          onChange={(v) => SERVICES[service].subscribable && setValue("frequency", v, opt)}
+          value={isSubscribable ? frequency : "one-off"}
+          onChange={(v) => isSubscribable && setValue("frequency", v, opt)}
           options={[
             { value: "one-off", label: "One-off clean" },
-            { value: "subscription", label: "Subscribe & save 15%" },
+            { value: "subscription", label: "Regular contract (Save 15%)" },
           ]}
-          className={cn(!SERVICES[service].subscribable && "pointer-events-none opacity-50")}
+          className={cn(!isSubscribable && "pointer-events-none opacity-50")}
         />
       </section>
 
-      <section>
-        <StepLabel>Property size</StepLabel>
-        <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
-          <Stepper
-            label="Bedrooms"
-            value={bedrooms}
-            options={BEDROOM_OPTIONS}
-            unit={bedLabel}
-            onChange={(v) => setValue("bedrooms", v, opt)}
-          />
-          <Stepper
-            label="Bathrooms"
-            value={bathrooms}
-            options={BATHROOM_OPTIONS}
-            unit={bathLabel}
-            onChange={(v) => setValue("bathrooms", v, opt)}
-          />
-        </div>
-      </section>
+      {/* Dynamic Property Specifications based on Service */}
+      {service === "commercial" ? (
+        <section className="space-y-4 rounded-2xl bg-surface/50 p-4 ring-1 ring-line">
+          <div>
+            <StepLabel aside="Offices, retail or communal">Premises Type</StepLabel>
+            <Segmented
+              label="Commercial Premises"
+              value={commercialType}
+              onChange={(v) => setValue("commercialType", v as any, opt)}
+              options={COMMERCIAL_TYPES.map((t) => ({
+                value: t,
+                label: COMMERCIAL_TYPE_LABELS[t],
+              }))}
+            />
+          </div>
+          <div>
+            <StepLabel aside="£25 per hour">Estimated Initial Hours</StepLabel>
+            <Stepper
+              label="Hours"
+              value={commercialHours}
+              options={COMMERCIAL_HOURS}
+              unit={hourLabel}
+              onChange={(v) => setValue("commercialHours", v as any, opt)}
+            />
+          </div>
+        </section>
+      ) : service === "specialist" ? (
+        <section className="space-y-4 rounded-2xl bg-surface/50 p-4 ring-1 ring-line">
+          <div>
+            <StepLabel aside="Gardening, odd jobs & property support">Service Focus</StepLabel>
+            <Segmented
+              label="Specialist Focus"
+              value={specialistType}
+              onChange={(v) => setValue("specialistType", v as any, opt)}
+              options={SPECIALIST_TYPES.map((t) => ({
+                value: t,
+                label: SPECIALIST_TYPE_LABELS[t],
+              }))}
+            />
+          </div>
+          <div>
+            <StepLabel aside="Bespoke project rate">Estimated Hours</StepLabel>
+            <Stepper
+              label="Hours"
+              value={specialistHours}
+              options={SPECIALIST_HOURS}
+              unit={hourLabel}
+              onChange={(v) => setValue("specialistHours", v as any, opt)}
+            />
+          </div>
+        </section>
+      ) : (
+        <section>
+          <StepLabel>Property size</StepLabel>
+          <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
+            <Stepper
+              label="Bedrooms"
+              value={bedrooms}
+              options={BEDROOM_OPTIONS}
+              unit={bedLabel}
+              onChange={(v) => setValue("bedrooms", v, opt)}
+            />
+            <Stepper
+              label="Bathrooms"
+              value={bathrooms}
+              options={BATHROOM_OPTIONS}
+              unit={bathLabel}
+              onChange={(v) => setValue("bathrooms", v, opt)}
+            />
+          </div>
+        </section>
+      )}
 
+      {/* Specialist Add-ons */}
       <section>
-        <StepLabel aside="Optional">Add-ons</StepLabel>
-        <div className="grid gap-2 sm:grid-cols-3 sm:gap-3">
+        <StepLabel aside="Optional specialist services">Specialist Add-ons</StepLabel>
+        <div className="grid gap-2 sm:grid-cols-3 sm:gap-2.5">
           {ADDON_IDS.map((id) => {
             const Icon = ADDON_ICONS[id];
             const on = addons.includes(id);
@@ -150,21 +239,21 @@ export function StepScope() {
                 aria-pressed={on}
                 onClick={() => toggleAddon(id)}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl p-3 text-left ring-1 transition-all duration-200 active:scale-[0.98]",
+                  "flex items-center gap-2.5 rounded-2xl p-2.5 text-left ring-1 transition-all duration-200 active:scale-[0.98] sm:p-3",
                   on ? "bg-brand-soft ring-2 ring-brand" : "bg-white ring-line hover:ring-brand/40",
                 )}
               >
                 <span
                   className={cn(
-                    "grid size-9 shrink-0 place-items-center rounded-xl transition-colors",
+                    "grid size-8 shrink-0 place-items-center rounded-xl transition-colors",
                     on ? "bg-brand text-white" : "bg-surface text-muted",
                   )}
                 >
-                  {on ? <Check className="size-4" strokeWidth={3} /> : <Icon className="size-[18px]" />}
+                  {on ? <Check className="size-3.5" strokeWidth={3} /> : <Icon className="size-4" />}
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-ink">{ADDONS[id].label}</span>
-                  <span className="block text-xs text-muted">+{formatGBPWhole(ADDONS[id].price)}</span>
+                  <span className="block text-[13px] font-semibold text-ink leading-tight">{ADDONS[id].label}</span>
+                  <span className="block text-[11px] text-muted">+{formatGBPWhole(ADDONS[id].price)}</span>
                 </span>
               </button>
             );
@@ -191,13 +280,12 @@ export function formatLongDate(iso: string, weekday: "long" | "short" = "long") 
 export function StepSchedule() {
   const {
     control,
-    register,
     setValue,
     formState: { errors },
   } = useFormContext<BookingFormValues>();
-  const [postcode, preferredDate, timeSlot] = useWatch({
+  const [preferredDate, timeSlot] = useWatch({
     control,
-    name: ["postcode", "preferredDate", "timeSlot"],
+    name: ["preferredDate", "timeSlot"],
   });
   const railRef = useRef<HTMLDivElement>(null);
 
@@ -223,32 +311,6 @@ export function StepSchedule() {
 
   return (
     <div className="space-y-6">
-      <Field
-        id="postcode"
-        label="Postcode"
-        hint="We cover Greater London & across the UK"
-        error={errors.postcode?.message}
-        valid={isValidUkPostcode(postcode)}
-      >
-        <MapPin className="pointer-events-none absolute left-4 top-3.5 size-5 text-slate-400" aria-hidden />
-        <TextInput
-          id="postcode"
-          placeholder="e.g. SW1A 1AA"
-          autoComplete="postal-code"
-          autoCapitalize="characters"
-          spellCheck={false}
-          maxLength={9}
-          className="pl-11 uppercase placeholder:normal-case"
-          error={!!errors.postcode}
-          valid={isValidUkPostcode(postcode)}
-          aria-describedby="postcode-error"
-          {...register("postcode", {
-            onBlur: (e) => {
-              if (e.target.value) setValue("postcode", formatUkPostcode(e.target.value), opt);
-            },
-          })}
-        />
-      </Field>
 
       <section>
         <StepLabel aside={preferredDate ? formatLongDate(preferredDate) : "Next 30 days"}>
@@ -350,18 +412,25 @@ export function StepCustomer({ onEdit }: { onEdit: (step: number) => void }) {
   const phoneValid = isValidUkPhone(v.phone ?? "");
   const emailValid = isValidEmail(v.email ?? "");
 
+  const serviceSpecText =
+    v.serviceType === "commercial"
+      ? `${COMMERCIAL_TYPE_LABELS[v.commercialType ?? "offices"]}, ${v.commercialHours ?? "3"} hrs`
+      : v.serviceType === "specialist"
+      ? `${SPECIALIST_TYPE_LABELS[v.specialistType ?? "gardening"]}, ${v.specialistHours ?? "2"} hrs`
+      : `${bedLabel(v.bedrooms ?? "2")}, ${bathLabel(v.bathrooms ?? "1")}`;
+
   return (
     <div className="space-y-5">
       {/* Compact summary with quick edit links */}
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-line ring-1 ring-line">
         <SummaryCell
           label="Service"
-          value={`${SERVICES[v.serviceType].short} · ${bedLabel(v.bedrooms)}, ${bathLabel(v.bathrooms)}`}
+          value={`${SERVICES[v.serviceType]?.short ?? "Service"} · ${serviceSpecText}`}
           onEdit={() => onEdit(0)}
         />
         <SummaryCell
-          label="When & where"
-          value={`${v.preferredDate ? formatLongDate(v.preferredDate, "short") : "—"} · ${TIME_SLOT_LABELS[v.timeSlot].label} · ${v.postcode}`}
+          label="Preferred schedule"
+          value={`${v.preferredDate ? formatLongDate(v.preferredDate, "short") : "—"} · ${TIME_SLOT_LABELS[v.timeSlot]?.label ?? "Window"}`}
           onEdit={() => onEdit(1)}
         />
       </div>
@@ -387,7 +456,7 @@ export function StepCustomer({ onEdit }: { onEdit: (step: number) => void }) {
             id="phone"
             type="tel"
             inputMode="tel"
-            placeholder="7700 900123"
+            placeholder="7566 227825"
             autoComplete="tel"
             className="pl-[4.25rem]"
             error={!!errors.phone}
@@ -401,7 +470,7 @@ export function StepCustomer({ onEdit }: { onEdit: (step: number) => void }) {
             id="email"
             type="email"
             inputMode="email"
-            placeholder="you@example.co.uk"
+            placeholder="you@example.com"
             autoComplete="email"
             error={!!errors.email}
             valid={emailValid}
@@ -411,11 +480,11 @@ export function StepCustomer({ onEdit }: { onEdit: (step: number) => void }) {
         </Field>
       </div>
 
-      <Field id="notes" label="Access notes" hint="Optional" error={errors.notes?.message}>
+      <Field id="notes" label="Access & requirements" hint="Optional" error={errors.notes?.message}>
         <TextArea
           id="notes"
           rows={3}
-          placeholder="e.g. Key safe by the front door, code 1234. Friendly cat called Biscuit."
+          placeholder="e.g. Commercial access details, key safe code, or specialist priorities..."
           error={!!errors.notes}
           {...register("notes")}
         />

@@ -7,22 +7,28 @@ import {
   Sparkles,
   Sun,
   Sunset,
+  Trees,
   Waves,
+  Wrench,
+  Leaf,
   type LucideIcon,
 } from "lucide-react";
 import type { AddonId, ServiceId, TimeSlot } from "@/lib/pricing";
 
-export const SERVICE_ICONS: Record<ServiceId | "office", LucideIcon> = {
+export const SERVICE_ICONS: Record<ServiceId, LucideIcon> = {
+  commercial: Building2,
   regular: House,
   deep: Sparkles,
   tenancy: KeyRound,
-  office: Building2,
+  specialist: Trees,
 };
 
 export const ADDON_ICONS: Record<AddonId, LucideIcon> = {
-  oven: CookingPot,
-  windows: Grid2x2,
   carpet: Waves,
+  windows: Grid2x2,
+  oven: CookingPot,
+  gardening: Leaf,
+  oddjobs: Wrench,
 };
 
 export const SLOT_ICONS: Record<TimeSlot, LucideIcon> = {
@@ -32,3 +38,4 @@ export const SLOT_ICONS: Record<TimeSlot, LucideIcon> = {
 
 export const bedLabel = (v: string) => `${v} bed`;
 export const bathLabel = (v: string) => `${v} bath`;
+export const hourLabel = (v: string) => `${v} hrs`;

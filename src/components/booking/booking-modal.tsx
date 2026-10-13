@@ -18,9 +18,13 @@ import { BookingSuccess, type SubmitStatus } from "./booking-success";
 const STEPS = ["Scope", "Schedule", "Your details"] as const;
 
 const DEFAULTS: BookingFormValues = {
-  serviceType: "regular",
+  serviceType: "commercial",
   bedrooms: "2",
   bathrooms: "1",
+  commercialType: "offices",
+  commercialHours: "3",
+  specialistType: "gardening",
+  specialistHours: "2",
   frequency: "one-off",
   addons: [],
   postcode: "",
@@ -83,11 +87,35 @@ export function BookingModal({
     setBookingId(null);
   }, [open, session, status, form]);
 
-  const [serviceType, bedrooms, bathrooms, frequency, addons] = useWatch({
+  const [
+    serviceType,
+    bedrooms,
+    bathrooms,
+    commercialHours,
+    specialistHours,
+    frequency,
+    addons,
+  ] = useWatch({
     control: form.control,
-    name: ["serviceType", "bedrooms", "bathrooms", "frequency", "addons"],
+    name: [
+      "serviceType",
+      "bedrooms",
+      "bathrooms",
+      "commercialHours",
+      "specialistHours",
+      "frequency",
+      "addons",
+    ],
   });
-  const estimate = estimatePrice({ service: serviceType, bedrooms, bathrooms, addons, frequency });
+  const estimate = estimatePrice({
+    service: serviceType ?? "commercial",
+    bedrooms,
+    bathrooms,
+    commercialHours,
+    specialistHours,
+    addons,
+    frequency,
+  });
 
   const goTo = useCallback(
     (next: number) => {
@@ -211,6 +239,8 @@ export function BookingModal({
                 service: submitted.serviceType,
                 bedrooms: submitted.bedrooms,
                 bathrooms: submitted.bathrooms,
+                commercialHours: submitted.commercialHours,
+                specialistHours: submitted.specialistHours,
                 addons: submitted.addons,
                 frequency: submitted.frequency,
               }).total}

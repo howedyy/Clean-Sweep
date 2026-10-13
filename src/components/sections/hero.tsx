@@ -8,7 +8,14 @@ import { Reveal } from "@/components/ui/section";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Segmented, Stepper } from "@/components/ui/controls";
 import { useBooking } from "@/components/booking/booking-provider";
-import { estimatePrice, BEDROOM_OPTIONS, BATHROOM_OPTIONS } from "@/lib/pricing";
+import {
+  estimatePrice,
+  BEDROOM_OPTIONS,
+  BATHROOM_OPTIONS,
+  COMMERCIAL_HOURS,
+  COMMERCIAL_TYPES,
+  COMMERCIAL_TYPE_LABELS,
+} from "@/lib/pricing";
 import { formatGBP } from "@/lib/utils";
 import type { BookingFormValues } from "@/lib/validation";
 
@@ -16,14 +23,31 @@ export function Hero() {
   const { openBooking } = useBooking();
   
   // Quick Estimator State
-  const [serviceType, setServiceType] = useState<BookingFormValues["serviceType"]>("regular");
+  const [serviceType, setServiceType] = useState<BookingFormValues["serviceType"]>("commercial");
   const [bedrooms, setBedrooms] = useState<BookingFormValues["bedrooms"]>("2");
   const [bathrooms, setBathrooms] = useState<BookingFormValues["bathrooms"]>("1");
+  const [commercialType, setCommercialType] = useState<BookingFormValues["commercialType"]>("offices");
+  const [commercialHours, setCommercialHours] = useState<BookingFormValues["commercialHours"]>("3");
 
-  const estimate = estimatePrice({ service: serviceType, bedrooms, bathrooms, addons: [], frequency: "one-off" });
+  const estimate = estimatePrice({
+    service: serviceType,
+    bedrooms,
+    bathrooms,
+    commercialHours,
+    addons: [],
+    frequency: "one-off",
+  });
 
   const handleBook = () => {
-    openBooking({ serviceType, bedrooms, bathrooms, frequency: "one-off", addons: [] });
+    openBooking({
+      serviceType,
+      bedrooms,
+      bathrooms,
+      commercialType,
+      commercialHours,
+      frequency: "one-off",
+      addons: [],
+    });
   };
 
   return (
@@ -37,39 +61,48 @@ export function Hero() {
           {/* Left: Copy & Trust Elements */}
           <div className="max-w-2xl">
             <Reveal y={20}>
-              <h1 className="font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl lg:text-[4rem] lg:leading-[1.1]">
-                Spotless Spaces, Zero Hassle.
-                <span className="block text-brand">Book in 60 Seconds.</span>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-hover shadow-sm ring-1 ring-line mb-6">
+                <span className="size-2 rounded-full bg-brand animate-pulse" />
+                Reliable • Professional • Family Run
+              </div>
+              <h1 className="font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl lg:text-[3.8rem] lg:leading-[1.12]">
+                Professional Cleaning &
+                <span className="block text-brand">Property Services</span>
               </h1>
             </Reveal>
             
             <Reveal delay={0.1} y={20}>
               <p className="mt-6 text-lg text-muted sm:text-xl leading-relaxed">
-                Fully vetted, DBS-checked professionals using eco-friendly products. Transparent pricing from £17/hr with guaranteed deposit return standards across the UK.
+                A trusted family-run business providing cleaning and property support services to domestic and commercial clients across London and the UK. High standards, flexible scheduling, and competitive pricing.
               </p>
             </Reveal>
             
             <Reveal delay={0.2} y={20}>
-              <div className="mt-8 flex flex-wrap gap-4 items-center">
-                <div className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-line">
-                  <div className="flex -space-x-1 text-amber-400">
+              <div className="mt-8 flex flex-wrap gap-3.5 items-center">
+                <div className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 shadow-sm ring-1 ring-line">
+                  <div className="flex -space-x-0.5 text-amber-400">
                     <Star className="size-4 fill-current" />
                     <Star className="size-4 fill-current" />
                     <Star className="size-4 fill-current" />
                     <Star className="size-4 fill-current" />
                     <Star className="size-4 fill-current" />
                   </div>
-                  <span className="text-xs font-semibold text-ink">4.9/5 Trustpilot</span>
+                  <span className="text-xs font-semibold text-ink">5-Star Client Feedback</span>
                 </div>
                 
-                <div className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-line">
+                <div className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 shadow-sm ring-1 ring-line">
                   <ShieldCheck className="size-4 text-brand" />
-                  <span className="text-xs font-semibold text-ink">DBS-Checked Staff</span>
+                  <span className="text-xs font-semibold text-ink">Public Liability Insured</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-line">
+                <div className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 shadow-sm ring-1 ring-line">
                   <BadgeCheck className="size-4 text-brand" />
-                  <span className="text-xs font-semibold text-ink">100% Satisfaction Guarantee</span>
+                  <span className="text-xs font-semibold text-ink">COSHH & H&S Practices</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 shadow-sm ring-1 ring-line">
+                  <span className="size-2 rounded-full bg-teal-500" />
+                  <span className="text-xs font-semibold text-ink">Commercial & Domestic</span>
                 </div>
               </div>
             </Reveal>
@@ -86,35 +119,59 @@ export function Hero() {
                   <Segmented
                     label="Service Type"
                     options={[
-                      { value: "regular", label: "Regular" },
+                      { value: "commercial", label: "Commercial" },
+                      { value: "regular", label: "Domestic" },
                       { value: "deep", label: "Deep Clean" },
-                      { value: "tenancy", label: "End of Tenancy" },
+                      { value: "tenancy", label: "Tenancy" },
                     ]}
                     value={serviceType}
                     onChange={setServiceType}
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <Stepper
-                      label="Bedrooms"
-                      unit={(v) => v}
-                      value={bedrooms}
-                      options={BEDROOM_OPTIONS}
-                      onChange={setBedrooms}
-                    />
+                {serviceType === "commercial" ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <Stepper
+                        label="Premises"
+                        unit={(v) => COMMERCIAL_TYPE_LABELS[v as keyof typeof COMMERCIAL_TYPE_LABELS] ?? v}
+                        value={commercialType}
+                        options={COMMERCIAL_TYPES}
+                        onChange={(v) => setCommercialType(v as any)}
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Stepper
+                        label="Est. Hours"
+                        unit={(v) => `${v} hrs`}
+                        value={commercialHours}
+                        options={COMMERCIAL_HOURS}
+                        onChange={(v) => setCommercialHours(v as any)}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    <Stepper
-                      label="Bathrooms"
-                      unit={(v) => v}
-                      value={bathrooms}
-                      options={BATHROOM_OPTIONS}
-                      onChange={setBathrooms}
-                    />
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <Stepper
+                        label="Bedrooms"
+                        unit={(v) => v}
+                        value={bedrooms}
+                        options={BEDROOM_OPTIONS}
+                        onChange={setBedrooms}
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Stepper
+                        label="Bathrooms"
+                        unit={(v) => v}
+                        value={bathrooms}
+                        options={BATHROOM_OPTIONS}
+                        onChange={setBathrooms}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 <div className="pt-6 border-t border-line mt-6 flex items-center justify-between gap-4">
                   <div>

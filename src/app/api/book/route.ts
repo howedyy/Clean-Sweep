@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
-  const bookingId = `CS-${randomInt(100000, 1000000)}`;
+  const bookingId = `CSO-${randomInt(100000, 1000000)}`;
 
   // Honeypot tripped: pretend success, write nothing.
   if (data.company) {
@@ -61,10 +61,19 @@ export async function POST(request: Request) {
     service: data.serviceType,
     bedrooms: data.bedrooms,
     bathrooms: data.bathrooms,
+    commercialHours: data.commercialHours,
+    specialistHours: data.specialistHours,
     addons: data.addons,
     frequency: data.frequency,
   });
   const subscribed = estimate.discounted;
+
+  const propertySpecs =
+    data.serviceType === "commercial"
+      ? `${data.commercialType ?? "Offices"} (${data.commercialHours ?? "3"} hrs)`
+      : data.serviceType === "specialist"
+      ? `${data.specialistType ?? "Gardening"} (${data.specialistHours ?? "2"} hrs)`
+      : `${data.bedrooms ?? "2"} bed / ${data.bathrooms ?? "1"} bath`;
 
   // Shape matches the Apps Script `doPost` in spec.md §5.1.
   const payload = {
@@ -72,12 +81,12 @@ export async function POST(request: Request) {
     fullName: data.fullName,
     email: data.email.toLowerCase(),
     phone: normaliseUkPhone(data.phone)!,
-    postcode: formatUkPostcode(data.postcode),
-    serviceType: `${SERVICES[data.serviceType].label}${subscribed ? " (Subscription −15%)" : " (One-off)"}`,
-    propertySpecs: `${data.bedrooms} bed / ${data.bathrooms} bath`,
-    addons: data.addons.length ? data.addons.map((a) => ADDONS[a].label).join(", ") : "None",
+    postcode: data.postcode ? formatUkPostcode(data.postcode) : "London & Surrounding Areas",
+    serviceType: `${SERVICES[data.serviceType]?.label ?? "Cleaning"}${subscribed ? " (Contract −15%)" : " (One-off)"}`,
+    propertySpecs,
+    addons: data.addons.length ? data.addons.map((a) => ADDONS[a]?.label).filter(Boolean).join(", ") : "None",
     preferredDate: toUkDate(data.preferredDate),
-    timeSlot: `${TIME_SLOT_LABELS[data.timeSlot].label} ${TIME_SLOT_LABELS[data.timeSlot].range}`,
+    timeSlot: `${TIME_SLOT_LABELS[data.timeSlot]?.label ?? "Day"} ${TIME_SLOT_LABELS[data.timeSlot]?.range ?? ""}`,
     estimatedPrice: formatGBP(estimate.total),
     notes: data.notes ?? "",
   };

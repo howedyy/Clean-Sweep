@@ -1,24 +1,34 @@
 /**
- * Business contact details used across the site.
- * ⚠️ Placeholder values: phone numbers use Ofcom's reserved "drama" ranges
- * (020 7946 0xxx / 07700 900xxx). Replace with the client's real details before launch.
+ * Business contact details for Clean Sweep Oasis LTD (from client presentation).
  */
 export const SITE = {
-  name: "Clean Swap",
-  email: "hello@cleanswap.co.uk",
-  phoneDisplay: "020 7946 0958",
-  phoneHref: "tel:+442079460958",
-  whatsappDisplay: "07700 900461",
+  name: "Clean Sweep Oasis LTD",
+  shortName: "Clean Sweep Oasis",
+  tagline: "Professional Cleaning & Property Services",
+  subtagline: "Reliable • Professional • Family Run",
+  email: "cleansweep89@outlook.com",
+  phoneDisplay: "07566 227825",
+  phoneHref: "tel:+447566227825",
+  whatsappDisplay: "07566 227825",
   whatsappHref:
-    "https://wa.me/447700900461?text=" + encodeURIComponent("Hi Clean Swap, I'd like a quote for a clean."),
-  address: ["Clean Swap HQ", "London, United Kingdom"],
-  hours: "Mon–Sat: 08:00–19:00",
+    "https://wa.me/447566227825?text=" +
+    encodeURIComponent("Hi Clean Sweep Oasis, I would like to request a free quotation."),
+  address: ["Clean Sweep Oasis LTD", "London & Surrounding Areas, United Kingdom"],
+  hours: "Mon–Sat: 08:00–19:00 (Flexible commercial hours)",
+  credentials: [
+    "Public Liability Insured",
+    "COSHH & Health-and-Safety Practices",
+    "Family-Run Business",
+    "Tailored No-Obligation Quotations",
+  ],
 } as const;
 
 export const NAV_ITEMS = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
-  { id: "clients", label: "Clients" },
   { id: "services", label: "Services" },
-  { id: "contact", label: "Contact" },
+  { id: "how-we-work", label: "How We Work" },
+  { id: "clients", label: "Reviews" },
+  { id: "contact", label: "Contact & Quote" },
 ] as const;
+

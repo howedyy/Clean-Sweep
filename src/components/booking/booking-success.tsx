@@ -36,12 +36,19 @@ export function BookingSuccess({
     setTimeout(() => setCopied(false), 1800);
   };
 
+  const specText =
+    values.serviceType === "commercial"
+      ? `${values.commercialType ?? "Offices"} (${values.commercialHours ?? "3"} hrs)`
+      : values.serviceType === "specialist"
+      ? `${values.specialistType ?? "Gardening"} (${values.specialistHours ?? "2"} hrs)`
+      : `${bedLabel(values.bedrooms ?? "2")}, ${bathLabel(values.bathrooms ?? "1")}`;
+
   const rows = [
     {
       icon: Sparkles,
-      label: SERVICES[values.serviceType].label,
-      sub: `${bedLabel(values.bedrooms)}, ${bathLabel(values.bathrooms)}${
-        values.addons.length ? ` · ${values.addons.map((a) => ADDONS[a].label).join(", ")}` : ""
+      label: SERVICES[values.serviceType]?.label ?? "Cleaning Service",
+      sub: `${specText}${
+        values.addons.length ? ` · ${values.addons.map((a) => ADDONS[a]?.label).filter(Boolean).join(", ")}` : ""
       }`,
     },
     {
@@ -49,7 +56,11 @@ export function BookingSuccess({
       label: formatLongDate(values.preferredDate),
       sub: `${TIME_SLOT_LABELS[values.timeSlot].label} arrival, ${TIME_SLOT_LABELS[values.timeSlot].range}`,
     },
-    { icon: MapPin, label: values.postcode.toUpperCase(), sub: "Service address postcode" },
+    {
+      icon: MapPin,
+      label: values.postcode ? values.postcode.toUpperCase() : "London & Surrounding Areas",
+      sub: values.postcode ? "Service address postcode" : "Service coverage area",
+    },
   ];
 
   return (
