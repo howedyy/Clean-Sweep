@@ -8,6 +8,7 @@ import { Reveal } from "@/components/ui/section";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Segmented, Stepper } from "@/components/ui/controls";
 import { useBooking } from "@/components/booking/booking-provider";
+import { Logo3D } from "@/components/3d/logo-3d";
 import {
   estimatePrice,
   BEDROOM_OPTIONS,
@@ -51,9 +52,9 @@ export function Hero() {
   };
 
   return (
-    <section id="home" className="relative overflow-hidden bg-brand-soft pt-32 pb-20 sm:pt-40 sm:pb-28">
-      {/* Background blobs for visual flair */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand/10 rounded-full blur-[100px] opacity-70" />
+    <section id="home" className="relative overflow-hidden bg-brand-soft/80 backdrop-blur-md pt-20 pb-20 sm:pt-28 sm:pb-28">
+      {/* Background ambient gradient */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand/5 rounded-full blur-[100px] opacity-40 pointer-events-none" />
       
       <div className="relative mx-auto max-w-7xl px-5 sm:px-7">
         <div className="grid gap-12 lg:grid-cols-[1.1fr,1fr] lg:gap-8 items-center">
@@ -61,9 +62,15 @@ export function Hero() {
           {/* Left: Copy & Trust Elements */}
           <div className="max-w-2xl">
             <Reveal y={20}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-hover shadow-sm ring-1 ring-line mb-6">
-                <span className="size-2 rounded-full bg-brand animate-pulse" />
-                Reliable • Professional • Family Run
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-hover shadow-sm ring-1 ring-line">
+                  <span className="size-2 rounded-full bg-brand animate-pulse" />
+                  Reliable • Professional • Family Run
+                </div>
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-50/90 px-3 py-1.5 text-xs font-semibold text-teal-800 ring-1 ring-teal-200/80 shadow-xs">
+                  <span className="size-2 rounded-full bg-teal-500 animate-ping" />
+                  Live 3D Tour • Scroll to Open Eye
+                </div>
               </div>
               <h1 className="font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl lg:text-[3.8rem] lg:leading-[1.12]">
                 Professional Cleaning &

@@ -1,10 +1,12 @@
 import { Header } from "@/components/sections/header";
+import { EyeIntro } from "@/components/sections/eye-intro";
 import { Hero } from "@/components/sections/hero";
 import { About } from "@/components/sections/about";
 import { Services } from "@/components/sections/services";
 import { Process } from "@/components/sections/process";
 import { Clients } from "@/components/sections/clients";
 import { Contact } from "@/components/sections/contact";
+import { ScrollTour3D } from "@/components/3d/scroll-tour-3d";
 import { SITE } from "@/lib/site";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,8 +14,10 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
+      <ScrollTour3D />
       <Header />
-      <main>
+      <main className="relative z-10">
+        <EyeIntro />
         <Hero />
         <About />
         <Services />
